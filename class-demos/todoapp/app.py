@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import sys
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://rng@localhost:5432/todoapp'
@@ -21,13 +22,25 @@ db.create_all()
 @app.route('/todos/create', methods=['POST'])
 # handler
 def create_todo():
-  description = request.form.get('description', '')
-  # create from class
-  todo = Todo(description=description)
-  db.session.add(todo)
-  db.session.commit()
-  # redirect to index page
-  return redirect(url_for('index'))
+    error = False
+    body = {}
+    try:
+        description = request.get_json()['description']
+        # create from class
+        todo = Todo(description=description)
+        db.session.add(todo)
+        db.session.commit()
+        body['description'] = todo.description
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    if error:
+        abort(400)
+    else:
+        return jsonify(body)
 
 
 # listens to our homepage
