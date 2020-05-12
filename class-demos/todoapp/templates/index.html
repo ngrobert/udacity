@@ -5,6 +5,23 @@
             .hidden {
                 display: none;
             }
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                width: 200px;
+            }
+            li {
+                clear: both;
+            }
+            li button {
+                -webkit-appearance: none;
+                border: none;
+                outline: none;
+                color: red;
+                float: right;
+                font-size: 20px;
+            }
         </style>
     </head>
     <div>
@@ -14,11 +31,40 @@
         </form>
         <div id="error" class="hidden">Something went wrong</div>
         <ul id="todos">
-            {% for d in data %}
-            <li>{{ d.description }}</li>
+            {% for todo in data %}
+            <li>
+                <input class="check-completed" data-id="{{ todo.id }}"
+                type="checkbox" {% if todo.completed %} checked {% endif %} />
+                {{ todo.description }}
+                <button class="delete-button" data-id="{{ todo.id }}">&cross;</button>
+            </li>
             {% endfor %}
         </ul>
         <script>
+            const checkboxes = document.querySelectorAll('.check-completed');
+            for (let i = 0; i < checkboxes.length; i++) {
+                const checkbox = checkboxes[i];
+                checkbox.onchange = function(e) {
+                    console.log('event', e);
+                    const newCompleted = e.target.checked;
+                    const todoId = e.target.dataset['id'];
+                    fetch('/todos/' + todoId + '/set-completed', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            'completed': newCompleted
+                        }),
+                        headers: {
+                            'Content-type': 'application/json'
+                        }
+                    })
+                    .then(function() {
+                        document.getElementById('error').className = 'hidden';
+                    })
+                    .catch(function() {
+                        document.getElementById('error').className = ''
+                    })
+                }
+            }
             document.getElementById('form').onsubmit = function(e) {
                 e.preventDefault();
                 fetch('/todos/create', {
@@ -43,7 +89,17 @@
                 .catch(function() {
                     document.getElementById('error').className = ''
                 })
-            }
+            };
+            const deleteBtns = document.querySelectorAll('.delete-button');
+                for (let i = 0; i < deleteBtns.length; i++) {
+                    const btn = deleteBtns[i];
+                    btn.onclick = function(e) {
+                        const todoId = e.target.dataset['id'];
+                        fetch('/todos/' + todoId, {
+                            method: 'DELETE'
+                        });
+                    }
+                }
         </script>
     </body>
 </html>
