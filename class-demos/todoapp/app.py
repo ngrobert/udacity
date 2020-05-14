@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import sys
@@ -17,18 +17,24 @@ class Todo(db.Model):
     description = db.Column(db.String(), nullable=False)
     # add completed column to test migration
     completed = db.Column(db.Boolean, nullable=False, default=False)
+    list_id = db.Column(db.Integer, db.ForeignKey('todolists.id'), nullable=False)
 
     def __repr__(self):
         return f'<Todo {self.id} {self.description}>'
 
+class TodoList(db.Model):
+    __tablename__ = 'todolists'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+    todos = db.relationship('Todo', backref='list', lazy=True)
+
 # define route that listens to the below
 @app.route('/todos/create', methods=['POST'])
-# handler
 def create_todo():
     error = False
     body = {}
     try:
-        description = request.get_json()['description']
+        description = request.json['description']
         # create from class
         todo = Todo(description=description)
         db.session.add(todo)
@@ -72,10 +78,18 @@ def delete_todo(todo_id):
 
 
 # listens to our homepage
-@app.route('/')
-def index():
+@app.route('/lists/<list_id>')
+def get_list_todos(list_id):
     # returns html file
     # pass in variables we want to pass into our template
     # include data from our database
-    return render_template('index.html', data=Todo.query.order_by('id').all())
+    return render_template('index.html',
+    lists=TodoList.query.all(),
+    active_list=TodoList.query.get(list_id),
+    todos=Todo.query.filter_by(list_id=list_id).order_by('id').all())
+
+# route to get_list_todos
+@app.route('/')
+def index():
+    return redirect(url_for('get_list_todos', list_id=1))
 
