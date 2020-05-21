@@ -33,7 +33,7 @@ class Venue(db.Model):
     __tablename__ = 'Venue'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String(120))
     genre = db.Column(db.String(120))
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
@@ -42,14 +42,15 @@ class Venue(db.Model):
     website = db.Column(db.String(500))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    seeking_talent = db.Column(db.String(120))
+    seeking_talent = db.Column(db.Boolean)
     seeking_talent_description = db.Column(db.String(500))
+    venue_shows = db.relationship('Show', backref="venue_show")
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String(120))
     genres = db.Column(db.String(120))
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
@@ -57,16 +58,20 @@ class Artist(db.Model):
     website = db.Column(db.String(500))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    seeking_performance = db.Column(db.String(120))
+    seeking_performance = db.Column(db.Boolean)
     seeking_performance_description = db.Column(db.String(500))
+    artist_shows = db.relationship('Show', backref="artist_show")
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+class Show(db.Model):
+    __tablename__ = 'Show'
+    id = db.Column(db.Integer, primary_key=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'))
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'))
+    artist_image_link = db.Column(db.String(500), db.ForeignKey('Artist.image_link'))
+    show_date = db.Column(db.String(120))
+    artist_name = db.Column(db.String(120), db.ForeignKey('Artist.name'))
+    venue_name = db.Column(db.String(120), db.ForeignKey('Venue.name'))
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-
-# class Show(db.Model):
-#   __tablename__ = 'Show'
-#   id = db.Column(db.Integer, primary_key=True)
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -119,6 +124,7 @@ def venues():
       "num_upcoming_shows": 0,
     }]
   }]
+
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
