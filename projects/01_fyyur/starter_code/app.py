@@ -44,7 +44,7 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_talent_description = db.Column(db.String(500))
-    venue_shows = db.relationship('Show', backref="venue_show")
+    show = db.relationship("Show", backref="Venue")
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -60,17 +60,15 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_performance = db.Column(db.Boolean)
     seeking_performance_description = db.Column(db.String(500))
-    artist_shows = db.relationship('Show', backref="artist_show")
+    show = db.relationship('Show', backref="Artist")
 
 class Show(db.Model):
     __tablename__ = 'Show'
     id = db.Column(db.Integer, primary_key=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'))
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'))
-    artist_image_link = db.Column(db.String(500), db.ForeignKey('Artist.image_link'))
-    show_date = db.Column(db.String(120))
-    artist_name = db.Column(db.String(120), db.ForeignKey('Artist.name'))
-    venue_name = db.Column(db.String(120), db.ForeignKey('Venue.name'))
+    start_time = db.Column(db.DateTime())
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+
 
 
 #----------------------------------------------------------------------------#
