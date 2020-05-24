@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 
 class Venue(db.Model):
-    __tablename__ = 'Venue'
+    __tablename__ = 'venue'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
@@ -40,14 +40,14 @@ class Venue(db.Model):
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
     website = db.Column(db.String(500))
-    image_link = db.Column(db.String(500))
+    image_link = db.Column(db.ARRAY(db.String))
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_talent_description = db.Column(db.String(500))
-    show = db.relationship("Show", backref="Venue")
+    show = db.relationship("show", backref="venue")
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+    __tablename__ = 'artist'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
@@ -59,17 +59,17 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
-    image_link = db.Column(db.String(500))
+    image_link = db.Column(db.ARRAY(db.String))
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
-    show = db.relationship('Show', backref="Artist")
+    show = db.relationship('show', backref="artist")
 
 class Show(db.Model):
-    __tablename__ = 'Show'
+    __tablename__ = 'show'
     id = db.Column(db.Integer, primary_key=True)
     start_time = db.Column(db.DateTime())
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
 
 
 
