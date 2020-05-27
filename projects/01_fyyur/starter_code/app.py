@@ -68,12 +68,8 @@ class Show(db.Model):
     __tablename__ = 'show'
     id = db.Column(db.Integer, primary_key=True)
     start_time = db.Column(db.DateTime())
-    artist_image_link = db.Column(db.String(500))
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
-    artist_name = db.Column(db.Integer, db.ForeignKey('artist.name'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
-    venue_name = db.Column(db.Integer, db.ForeignKey('venue.name'), nullable=False)
-
 
 
 #----------------------------------------------------------------------------#
@@ -104,27 +100,17 @@ def index():
 
 @app.route('/venues')
 def venues():
-    data = [{
-        "city": "San Francisco",
-        "state": "CA",
-        "venues": [{
-            "id": 1,
-            "name": "The Musical Hop",
-            "num_upcoming_shows": 0,
-        }, {
-            "id": 3,
-            "name": "Park Square Live Music & Coffee",
-            "num_upcoming_shows": 1,
-        }]
-    }, {
-        "city": "New York",
-        "state": "NY",
-        "venues": [{
-            "id": 2,
-            "name": "The Dueling Pianos Bar",
-            "num_upcoming_shows": 0,
-        }]
-    }]
+    data = []
+    cities = db.session.query(Venue.city, Venue.state).distinct(Venue.city, Venue.state)
+
+    for city in cities:
+        venues_city = db.session.query(Venue.id, Venue.name).filter(Venue.city == city[0]).filter(
+            Venue.state == city[1])
+        data.append({
+            "city": city[0],
+            "state": city[1],
+            "venues": venues_city
+        })
 
     return render_template('pages/venues.html', areas=data)
 
@@ -201,11 +187,11 @@ def artists():
     all_artists = Artist.query.all()
     data = []
     for artist in all_artists:
-      response = {
+        response = {
           "id": artist.id,
           "name": artist.name
-      }
-      data.append(response)
+        }
+        data.append(response)
     return render_template('pages/artists.html', artists=data)
 
 @app.route('/artists/search', methods=['POST'])
@@ -326,15 +312,12 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
     data = []
-    shows = db.session.query(Show.artist_id, Show.artist_name, Show.venue_id, Show.venue_name, Show.artist_image_link, Show.start_time).all()
+    shows = db.session.query(Show.artist_id, Show.venue_id, Show.start_time).all()
 
     for show in shows:
         data.append({
             "venue_id": show.venue_id,
-            "venue_name": show.venue_name,
             "artist_id": show.artist_id,
-            "artist_name": show.artist_name,
-            "artist_image_link": show.artist_image_link,
             "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
         })
         return render_template('pages/shows.html', shows=data)
