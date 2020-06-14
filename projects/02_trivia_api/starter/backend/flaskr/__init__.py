@@ -12,21 +12,27 @@ def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
   setup_db(app)
-  
-  '''
-  @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-  '''
 
-  '''
-  @TODO: Use the after_request decorator to set Access-Control-Allow
-  '''
+  # any origins from the client can access the uri
+  CORS(app, resources={r"/*": {"origins": "*"}})
+
+  # after request is received, add headers and allow the following methods
+  @app.after_request
+  def after_request(response):
+    response.headers.add('Access-Control-Allow', 'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow', 'GET, POST, PATCH, DELETE, OPTIONS')
+    return response
 
   '''
   @TODO: 
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
-
+  @app.route('/categories', methods=['GET'])
+  def get_categories():
+    categories = categories = Category.query.order_by(Category.id).all()
+    print(categories)
+    return categories
 
   '''
   @TODO: 
