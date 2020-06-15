@@ -28,14 +28,17 @@ def create_app(test_config=None):
   def get_categories():
       categories = Category.query.order_by(Category.id).all()
       categories = [category.type for category in categories]
+      try:
+        if len(categories) == 0:
+          abort(404)
 
-      if len(categories) == 0:
-        abort(404)
+        return jsonify({
+          'success': True,
+          'categories': categories,
+        })
 
-      return jsonify({
-        'success': True,
-        'categories': categories,
-      })
+      except:
+        abort(422)
 
   # return a list of questions, number of total questions, current category, categories
   # pagination (every 10 questions)
@@ -66,13 +69,33 @@ def create_app(test_config=None):
     })
 
 
-  '''
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
+  # '''
+  # TEST: When you click the trash icon next to a question, the question will be removed.
+  # This removal will persist in the database and when you refresh the page.
+  # '''
 
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
-  '''
+
+  @app.route('/questions/<int:question_id>', methods=['DELETE'])
+  def delete_question(question_id):
+    try:
+      question = Question.query.filter(Question.id == question_id).one_or_none()
+      if question is None:
+        abort(404)
+        question.delete()
+        all_questions = Question.query.order_by(Question.id).all()
+
+        if len(all_questions) == 0:
+          abort(404)
+
+        return jsonify({
+          'success': True,
+          'deleted': question_id,
+          'total_questions': len(all_questions)
+        })
+
+    except:
+      abort(422)
+
 
   '''
   @TODO: 
