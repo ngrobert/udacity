@@ -23,29 +23,48 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow', 'GET, POST, PATCH, DELETE, OPTIONS')
     return response
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests 
-  for all available categories.
-  '''
+  # return all available categories
   @app.route('/categories', methods=['GET'])
   def get_categories():
-    categories = categories = Category.query.order_by(Category.id).all()
-    print(categories)
-    return categories
+      categories = Category.query.order_by(Category.id).all()
+      categories = [category.type for category in categories]
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
+      if len(categories) == 0:
+        abort(404)
 
-  TEST: At this point, when you start the application
-  you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
-  '''
+      return jsonify({
+        'success': True,
+        'categories': categories,
+      })
+
+  # return a list of questions, number of total questions, current category, categories
+  # pagination (every 10 questions)
+  @app.route('/questions', methods=['GET'])
+  def get_questions():
+    page = request.args.get('page', 1, type=int)
+    start = (page - 1) * 10
+    end = start + 10
+
+    all_questions = Question.query.order_by(Question.id).all()
+    paginate_questions = [question.format() for question in all_questions]
+
+    if len(paginate_questions) == 0:
+      abort(404)
+
+    categories = set()
+    for question in paginate_questions:
+      categories.add(question['category'])
+
+    all_categories = Category.query.order_by(Category.id).all()
+    categories = [category.type for category in all_categories]
+
+    return jsonify({
+      'success': True,
+      'questions': paginate_questions[start:end],
+      'categories': categories,
+      'total_questions': len(all_questions)
+    })
+
 
   '''
   @TODO: 
