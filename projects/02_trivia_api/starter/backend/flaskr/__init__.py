@@ -79,19 +79,21 @@ def create_app(test_config=None):
   def delete_question(question_id):
     try:
       question = Question.query.filter(Question.id == question_id).one_or_none()
+
       if question is None:
         abort(404)
-        question.delete()
-        all_questions = Question.query.order_by(Question.id).all()
 
-        if len(all_questions) == 0:
-          abort(404)
+      question.delete()
+      all_questions = Question.query.order_by(Question.id).all()
 
-        return jsonify({
-          'success': True,
-          'deleted': question_id,
-          'total_questions': len(all_questions)
-        })
+      if len(all_questions) == 0:
+        abort(404)
+
+      return jsonify({
+        'success': True,
+        'deleted': question_id,
+        'total_questions': len(all_questions)
+      })
 
     except:
       abort(422)
