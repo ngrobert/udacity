@@ -33,6 +33,18 @@ class TriviaTestCase(unittest.TestCase):
     TODO
     Write at least one test for each test for successful operation and for expected errors.
     """
+
+    def test_paginate(self):
+        """
+        Tests paginate function
+        """
+        response = self.client().get('/questions')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(len(data['questions']) <= 10)
+
     def test_get_categories(self):
         """
         Tests get_categories function
@@ -67,9 +79,43 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['deleted'], 10)
-        self.assertEqual(data['all_questions'])
-        self.assertEqual(len(data['questions']))
         self.assertEqual(question, None)
+
+    def test_create_question(self):
+        """
+        Tests create_question function
+        """
+        total_questions_before = len(Question.query.all())
+        new_question = {
+            "question": "question?",
+            "answer": "answer!",
+            "category": "1",
+            "difficulty": "2",
+        }
+        response = self.client().post('questions', json=new_question)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['created'])
+        added_question = data['total_questions'] - total_questions_before
+        self.assertTrue(added_question, 1)
+
+    def test_search_question(self):
+        """
+        Tests search_question function
+        """
+        search = {
+            "search_term": "foo"
+        }
+        response = self.client().post('search', json=search)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+
+
 
 
 # Make the tests conveniently executable

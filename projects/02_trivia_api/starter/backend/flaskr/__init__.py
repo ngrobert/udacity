@@ -23,6 +23,18 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow', 'GET, POST, PATCH, DELETE, OPTIONS')
     return response
 
+  # paginates ten questions per page
+  def paginate(request, all_questions):
+    page = request.args.get('page', 1, type=int)
+    start = (page - 1) * QUESTIONS_PER_PAGE
+    end = start + QUESTIONS_PER_PAGE
+
+    questions = [question.format() for question in all_questions]
+    current_questions = questions[start:end]
+
+    return current_questions
+
+
   # return all available categories
   @app.route('/categories', methods=['GET'])
   def get_categories():
@@ -41,21 +53,16 @@ def create_app(test_config=None):
         abort(422)
 
   # return a list of questions, number of total questions, current category, categories
-  # pagination (every 10 questions)
   @app.route('/questions', methods=['GET'])
   def get_questions():
-    page = request.args.get('page', 1, type=int)
-    start = (page - 1) * 10
-    end = start + 10
-
     all_questions = Question.query.order_by(Question.id).all()
-    paginate_questions = [question.format() for question in all_questions]
+    ten_questions = paginate(request, all_questions)
 
-    if len(paginate_questions) == 0:
+    if len(ten_questions) == 0:
       abort(404)
 
     categories = set()
-    for question in paginate_questions:
+    for question in ten_questions:
       categories.add(question['category'])
 
     all_categories = Category.query.order_by(Category.id).all()
@@ -63,7 +70,7 @@ def create_app(test_config=None):
 
     return jsonify({
       'success': True,
-      'questions': paginate_questions[start:end],
+      'questions': ten_questions,
       'categories': categories,
       'total_questions': len(all_questions)
     })
@@ -99,27 +106,73 @@ def create_app(test_config=None):
       abort(422)
 
 
-  '''
-  @TODO: 
-  Create an endpoint to POST a new question, 
-  which will require the question and answer text, 
-  category, and difficulty score.
 
-  TEST: When you submit a question on the "Add" tab, 
-  the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.  
-  '''
+  # TEST: When you submit a question on the "Add" tab,
+  # the form will clear and the question will appear at the end of the last page
+  # of the questions list in the "List" tab.
 
-  '''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
+  # Create new question with answer, category, and difficulty score
+  @app.route('/questions', methods=['POST'])
+  def create_question():
+    try:
+      body = request.get_json()
+      category_id = body.get('category', None)
+      new_question = Question(
+        question=body.get('question', None),
+        answer=body.get('answer', None),
+        category=category_id,
+        difficulty=body.get('difficulty', None)
+      )
+      new_question.insert()
 
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-  '''
+      all_questions = Question.query.order_by(Question.id).all()
+      category_type = Category.query.get(category_id).type
+
+      return jsonify({
+        'success': True,
+        'created': new_question.id,
+        'current_category': category_type,
+        'total_questions': len(all_questions)
+      })
+
+    except:
+      abort(422)
+
+
+  # '''
+  # TEST: Search by any phrase. The questions list will update to include
+  # only question that include that string within their question.
+  # Try using the word "title" to start.
+  # '''
+
+  # get questions based on a search term
+  @app.route('/search_question', methods=['POST'])
+  def search_question():
+    try:
+      body = request.get_json()
+      search_term = body.get('search_term', None)
+      found_questions = Question.query.filter(Question.question.ilike(f'%{search_term}%'))\
+        .order_by(Question.id).all()
+      current_questions = paginate(request, found_questions)
+
+      if len(current_questions) == 0:
+        abort(404)
+
+      categories = set()
+      for question in current_questions:
+        categories.add(Category.query.get(question['category']).type)
+
+      return jsonify({
+        'success': True,
+        'questions': current_questions,
+        'current_category': None,
+        'total_questions': len(Question.query.all())
+      })
+
+    except:
+      abort(422)
+
+
 
   '''
   @TODO: 
