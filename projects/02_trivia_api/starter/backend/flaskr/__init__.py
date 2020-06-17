@@ -31,7 +31,6 @@ def create_app(test_config=None):
 
     questions = [question.format() for question in all_questions]
     current_questions = questions[start:end]
-
     return current_questions
 
 
@@ -151,8 +150,7 @@ def create_app(test_config=None):
     try:
       body = request.get_json()
       search_term = body.get('search_term', None)
-      found_questions = Question.query.filter(Question.question.ilike(f'%{search_term}%'))\
-        .order_by(Question.id).all()
+      found_questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
       current_questions = paginate(request, found_questions)
 
       if len(current_questions) == 0:
@@ -173,15 +171,15 @@ def create_app(test_config=None):
       abort(422)
 
 
-
-  '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
-
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
-  '''
+  #
+  # '''
+  # @TODO:
+  # Create a GET endpoint to get questions based on category.
+  #
+  # TEST: In the "List" tab / main screen, clicking on one of the
+  # categories in the left column will cause only questions of that
+  # category to be shown.
+  # '''
 
 
   '''
