@@ -228,14 +228,34 @@ def create_app(test_config=None):
   # and shown whether they were correct or not.
   # '''
 
-  @app.route('/trivia', methods=['POST'])
+  @app.route('/quizzes', methods=['POST'])
   def play_trivia():
     """
     endpoint should take category and previous question parameters
     and return a random questions within the given category,
     if provided, and that is not one of the previous questions.
     """
-    pass
+    try:
+      data = request.get_json()
+      category_id = int(data['quiz_category']['id'])
+      category = Category.query.get(category_id)
+      previous_questions = data['previous_questions']
+      data['previous_questions'] = []
+      if not category:
+        if not len(previous_questions):
+          body = get_questions()
+        else:
+          questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
+      else:
+        questions = Question.query.filter(Question.category == category.id).all()
+
+      question = random.choice(questions)
+      data['questions'] = question
+
+      return jsonify(body)
+
+    except:
+      abort(422)
 
   @app.errorhandler(400)
   def bad_request(error):
