@@ -85,7 +85,7 @@ class TriviaTestCase(unittest.TestCase):
             "question": "question?",
             "answer": "answer!",
             "category": "1",
-            "difficulty": "2",
+            "difficulty": "2"
         }
         response = self.client().post('questions', json=new_question)
         data = json.loads(response.data)
@@ -129,7 +129,7 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().post(
             'quizzes', data=json.dumps({
                 "previous_questions": [10, 2],
-                "categories": {"type": "History", "id": "4"},
+                "quiz_category": {"type": "History", "id": "4"},
             }),
             content_type='application/json'
         )
@@ -137,11 +137,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data['questions'])
-        self.assertTrue(data['total_questions'])
-        self.assertEqual(data['previous_questions'], [10, 2])
-        self.assertEqual(data['categories'], 4)
-
+        self.assertTrue(data['question'])
 
         # Make the tests conveniently executable
 if __name__ == "__main__":

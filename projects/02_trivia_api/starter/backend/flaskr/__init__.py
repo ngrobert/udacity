@@ -235,24 +235,25 @@ def create_app(test_config=None):
     and return a random questions within the given category,
     if provided, and that is not one of the previous questions.
     """
+
+    body = request.get_json()
+    previous_questions = body.get('previous_questions', None)
+    quiz_category = body.get('quiz_category', None)
+
     try:
-      data = request.get_json()
-      category_id = int(data['quiz_category']['id'])
-      category = Category.query.get(category_id)
-      previous_questions = data['previous_questions']
-      data['previous_questions'] = []
-      if not category:
-        if not len(previous_questions):
-          body = get_questions()
-        else:
-          questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
+      if not quiz_category['id']:
+        questions_query = Question.query.filter(Question.id.notin_(previous_questions)).all()
       else:
-        questions = Question.query.filter(Question.category == category.id).all()
+        questions_query = Question.query.filter(Question.category == quiz_category['id'],
+                                                Question.id.notin_(previous_questions)).all()
+      questions = [question.format() for question in questions_query]
+      random_question = random.choice(questions)
 
-      question = random.choice(questions)
-      data['questions'] = question
-
-      return jsonify(body)
+      if random_question:
+        return jsonify({
+          "success": True,
+          "question": random_question
+        })
 
     except:
       abort(422)
