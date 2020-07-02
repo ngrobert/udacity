@@ -69,11 +69,11 @@ class TriviaTestCase(unittest.TestCase):
         response = self.client().delete('/questions/50')
         data = json.loads(response.data)
 
-        question = Question.query.filter(Question.id == 50).one_or_none()
+        question = Question.query.filter(Question.id == 20).one_or_none()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 50)
+        self.assertEqual(data['deleted'], 20)
         self.assertEqual(question, None)
 
     def test_create_question(self):
