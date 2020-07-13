@@ -66,14 +66,14 @@ class TriviaTestCase(unittest.TestCase):
         """
         Tests delete_question function
         """
-        response = self.client().delete('/questions/50')
+        response = self.client().delete('/questions/24')
         data = json.loads(response.data)
 
-        question = Question.query.filter(Question.id == 20).one_or_none()
+        question = Question.query.filter(Question.id == 24).one_or_none()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 20)
+        self.assertEqual(data['deleted'], 24)
         self.assertEqual(question, None)
 
     def test_create_question(self):
@@ -101,7 +101,7 @@ class TriviaTestCase(unittest.TestCase):
         Tests search_question function
         """
         search = {
-            "search_term": "original"
+            "searchTerm": "original"
         }
         response = self.client().post('search_question', json=search)
         data = json.loads(response.data)
@@ -114,13 +114,12 @@ class TriviaTestCase(unittest.TestCase):
         """
         Tests get_question_by_category function
         """
-        response = self.client().get('/category/4/questions')
+        response = self.client().get('/categories/4/questions')
         data = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['questions'])
-        self.assertTrue(data['category'] == "History")
 
     def test_play_trivia(self):
         """

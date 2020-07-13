@@ -169,7 +169,7 @@ def create_app(test_config=None):
     """
     try:
       body = request.get_json()
-      search_term = body.get('search_term', None)
+      search_term = body.get('searchTerm', None)
       found_questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
       paginated_questions = paginate(request, found_questions)
 
@@ -197,11 +197,12 @@ def create_app(test_config=None):
   # '''
 
 
-  @app.route('/category/<int:category_id>/questions', methods=['GET'])
+  @app.route('/categories/<int:category_id>/questions', methods=['GET'])
   def get_questions_by_category(category_id):
     """
     Return questions based on category
     """
+    category_id = category_id + 1
     try:
       category_questions = Question.query.filter(Question.category == str(category_id)).order_by(
         Question.id).all()
