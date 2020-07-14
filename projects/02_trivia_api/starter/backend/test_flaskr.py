@@ -40,6 +40,17 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(len(data['questions']) <= 10)
 
+    def test_paginate_error(self):
+        """
+        Tests paginate function returns error if page is out of range
+        """
+        response = self.client().get('/questions&page=20')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Resource not found')
+
     def test_get_categories(self):
         """
         Tests get_categories function
@@ -66,15 +77,26 @@ class TriviaTestCase(unittest.TestCase):
         """
         Tests delete_question function
         """
-        response = self.client().delete('/questions/24')
+        response = self.client().delete('/questions/46')
         data = json.loads(response.data)
 
-        question = Question.query.filter(Question.id == 24).one_or_none()
+        question = Question.query.filter(Question.id == 46).one_or_none()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 24)
+        self.assertEqual(data['deleted'], 46)
         self.assertEqual(question, None)
+
+    def test_delete_question_error(self):
+        """
+        Tests delete function returns error if id is out of range
+        """
+        response = self.client().delete('/questions/240')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['error'], 422)
 
     def test_create_question(self):
         """
@@ -121,6 +143,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['questions'])
 
+    def test_get_questions_by_category_error(self):
+        """
+        Tests get_questions_by_category function returns error if id is out of range
+        """
+        response = self.client().get('/categories/40/questions')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+
     def test_play_trivia(self):
         """
         Tests play_trivia function
@@ -137,6 +169,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question'])
+
 
         # Make the tests conveniently executable
 if __name__ == "__main__":

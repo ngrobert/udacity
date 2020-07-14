@@ -240,6 +240,7 @@ def create_app(test_config=None):
     body = request.get_json()
     previous_questions = body.get('previous_questions', None)
     quiz_category = body.get('quiz_category', None)
+    quiz_category['id'] = str(int(quiz_category['id']) + 1)
 
     try:
       if not quiz_category['id']:
@@ -248,8 +249,14 @@ def create_app(test_config=None):
         questions_query = Question.query.filter(Question.category == quiz_category['id'],
                                                 Question.id.notin_(previous_questions)).all()
       questions = [question.format() for question in questions_query]
-      random_question = random.choice(questions)
 
+      if len(questions) == 0:
+        return jsonify({
+          "success:": True,
+          "question": None
+        })
+
+      random_question = random.choice(questions)
       if random_question:
         return jsonify({
           "success": True,
