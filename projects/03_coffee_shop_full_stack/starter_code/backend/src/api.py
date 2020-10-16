@@ -41,6 +41,7 @@ def handler():
 @app.route('/drinks')
 def get_drinks():
     drinks = [drink.short() for drink in Drink.query.all()]
+
     return jsonify({
         'success': True,
         "drinks": drinks
@@ -56,15 +57,15 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 
-@app.route('/drinks-detail')
-@requires_auth('get:drinks-detail')
-def get_drinks_detail(payload):
+@app.route("/drinks-detail")
+@requires_auth("get:drinks-detail")
+def get_drinks_detail(token):
     drinks = [drink.long() for drink in Drink.query.all()]
+
     return jsonify({
         'success': True,
         "drinks": drinks
-    }), 200
-
+    })
 
 '''
 @TODO implement endpoint
@@ -76,7 +77,15 @@ def get_drinks_detail(payload):
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def create_drink(token):
+    drink = [drink.long() for drink in Drink.query.all()]
 
+    return jsonify({
+        'success': True,
+        "drinks": drink
+    })
 
 '''
 @TODO implement endpoint
@@ -90,6 +99,16 @@ def get_drinks_detail(payload):
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def update_drink(token, drink_id):
+    drink = Drink.query.filter_by(id=drink_id).one_or_none().long()
+
+    return jsonify({
+        'success': True,
+        "drinks": drink
+    })
+
 
 '''
 @TODO implement endpoint
@@ -102,18 +121,30 @@ def get_drinks_detail(payload):
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drink(token, drink_id):
+    drink = Drink.query.filter_by(id=drink_id).one_or_none()
+
+    return jsonify({
+        'success': True,
+        "delete": drink
+    })
+
+
+
 
 ## Error Handling
 '''
 Example error handling for unprocessable entity
 '''
 @app.errorhandler(422)
-def unprocessable(error):
+def unprocessable_entity(error):
     return jsonify({
-                    "success": False, 
-                    "error": 422,
-                    "message": "unprocessable"
-                    }), 422
+        "success": False,
+        "error": 422,
+        "message": "unprocessable entity"
+    }), 422
 
 '''
 @TODO implement error handlers using the @app.errorhandler(error) decorator
@@ -126,13 +157,30 @@ def unprocessable(error):
 
 '''
 
+
+
 '''
 @TODO implement error handler for 404
     error handler should conform to general task above 
 '''
 
+@app.errorhandler(404)
+def resource_not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "resource not found"
+    }), 404
 
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": "unauthorized"
+    }), 401
