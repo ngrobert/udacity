@@ -1,5 +1,5 @@
 import json
-from flask import request, _request_ctx_stack
+from flask import request, _request_ctx_stack, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
@@ -7,7 +7,8 @@ from urllib.request import urlopen
 
 AUTH0_DOMAIN = 'dev-8fxctlec.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'https://coffeeshop/'
+API_AUDIENCE = 'coffeeshop'
+# API_AUDIENCE = 'https://coffeeshop/'
 
 ## AuthError Exception
 '''
@@ -56,7 +57,19 @@ def get_token_auth_header():
     return true otherwise
 '''
 def check_permissions(permission, payload):
-    raise Exception('Not Implemented')
+    if 'permissions' not in payload:
+        raise AuthError({
+            'code': 'invalid_claims',
+            'description': 'Permissions not included in JWT.'
+        }, 400)
+
+    if permission not in payload['permissions']:
+        raise AuthError({
+            'code': 'unauthorized',
+            'description': 'Permission not found.'
+        }, 401)
+    else:
+        return True
 
 '''
 @TODO implement verify_decode_jwt(token) method
@@ -145,6 +158,5 @@ def requires_auth(permission=''):
                 abort(401)
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
-
         return wrapper
     return requires_auth_decorator

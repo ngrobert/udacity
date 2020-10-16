@@ -20,8 +20,15 @@ CORS(app)
 db_drop_and_create_all()
 
 
-
 ## ROUTES
+
+@app.route("/")
+def handler():
+    return jsonify({
+        "success": True
+    })
+
+
 '''
 @TODO implement endpoint
     GET /drinks
@@ -31,6 +38,13 @@ db_drop_and_create_all()
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks')
+def get_drinks():
+    drinks = [drink.short() for drink in Drink.query.all()]
+    return jsonify({
+        'success': True,
+        "drinks": drinks
+    })
 
 
 '''
@@ -42,6 +56,15 @@ db_drop_and_create_all()
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks-detail')
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(payload):
+    drinks = [drink.long() for drink in Drink.query.all()]
+    return jsonify({
+        'success': True,
+        "drinks": drinks
+    }), 200
+
 
 '''
 @TODO implement endpoint
@@ -52,6 +75,7 @@ db_drop_and_create_all()
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+
 
 
 '''
