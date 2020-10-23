@@ -41,11 +41,11 @@ def handler():
 @app.route('/drinks')
 def get_drinks():
     drinks = [drink.short() for drink in Drink.query.all()]
-
     return jsonify({
-        'success': True,
+        "success": True,
         "drinks": drinks
     })
+
 
 
 '''
@@ -80,12 +80,22 @@ def get_drinks_detail(token):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def create_drink(token):
-    drink = [drink.long() for drink in Drink.query.all()]
-
-    return jsonify({
-        'success': True,
-        "drinks": drink
-    })
+    try:
+        print("request", request)
+        body = request.get_json()
+        print("body", body)
+        new_drink = Drink(
+            drink_name=body.get("title", None),
+            drink_recipe=body.get("recipe", None)
+        )
+        new_drink.insert()
+        drink = [new_drink.long()]
+        return jsonify({
+            "success": True,
+            "drinks": drink
+        })
+    except:
+        abort(422)
 
 '''
 @TODO implement endpoint
@@ -105,7 +115,7 @@ def update_drink(token, drink_id):
     drink = Drink.query.filter_by(id=drink_id).one_or_none()
 
     return jsonify({
-        'success': True,
+        "success": True,
         "drinks": [drink]
     })
 
@@ -127,7 +137,7 @@ def delete_drink(token, drink_id):
     drink = Drink.query.filter_by(id=drink_id).one_or_none()
 
     return jsonify({
-        'success': True,
+        "success": True,
         "delete": drink
     })
 
