@@ -102,11 +102,11 @@ def create_drink(token):
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def update_drink(token, drink_id):
-    drink = Drink.query.filter_by(id=drink_id).one_or_none().long()
+    drink = Drink.query.filter_by(id=drink_id).one_or_none()
 
     return jsonify({
         'success': True,
-        "drinks": drink
+        "drinks": [drink]
     })
 
 
@@ -177,10 +177,11 @@ def resource_not_found(error):
     error handler should conform to general task above 
 '''
 
-@app.errorhandler(401)
-def unauthorized(error):
-    return jsonify({
-        "success": False,
-        "error": 401,
-        "message": "unauthorized"
-    }), 401
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    """
+    Handle global auth errors
+    """
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
