@@ -40,9 +40,10 @@ def handler():
 
 @app.route('/drinks')
 def get_drinks():
-    drinks = [drink.short() for drink in Drink.query.all()]
+    drinks = [drink.long() for drink in Drink.query.all()]
+
     return jsonify({
-        "success": True,
+        'success': True,
         "drinks": drinks
     })
 
@@ -80,22 +81,20 @@ def get_drinks_detail(token):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def create_drink(token):
-    try:
-        print("request", request)
-        body = request.get_json()
-        print("body", body)
-        new_drink = Drink(
-            drink_name=body.get("title", None),
-            drink_recipe=body.get("recipe", None)
-        )
-        new_drink.insert()
-        drink = [new_drink.long()]
-        return jsonify({
-            "success": True,
-            "drinks": drink
-        })
-    except:
-        abort(422)
+    if request.data:
+        try:
+            new_drink_data = json.loads(request.data.decode("utf-8"))
+            new_drink = Drink(title=new_drink_data["title"],
+                              recipe=json.dumps(new_drink_data["recipe"]))
+            Drink.insert(new_drink)
+            drink = list(map(Drink.long, Drink.query.all()))
+            return jsonify({
+                "success": True,
+                "drinks": drink
+            })
+        except BaseException as e:
+            print(e)
+            abort(422)
 
 '''
 @TODO implement endpoint
