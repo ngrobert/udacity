@@ -5,7 +5,8 @@ from sqlalchemy import exc
 import json
 from flask_cors import CORS
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
+# from .database.models import db_drop_and_create_all, setup_db, Drink
+from .database.models import setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
@@ -17,7 +18,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-db_drop_and_create_all()
+# db_drop_and_create_all()
 
 
 ## ROUTES
@@ -40,12 +41,14 @@ def handler():
 
 @app.route('/drinks')
 def get_drinks():
-    drinks = [drink.long() for drink in Drink.query.all()]
-
-    return jsonify({
-        'success': True,
-        "drinks": drinks
-    })
+    try:
+        drinks = [drink.short() for drink in Drink.query.all()]
+        return jsonify({
+            "success": True,
+            "drinks": drinks
+        })
+    except Exception:
+        abort(422)
 
 
 
@@ -61,12 +64,14 @@ def get_drinks():
 @app.route("/drinks-detail")
 @requires_auth("get:drinks-detail")
 def get_drinks_detail(token):
-    drinks = [drink.long() for drink in Drink.query.all()]
-
-    return jsonify({
-        'success': True,
-        "drinks": drinks
-    })
+    try:
+        drinks = [drink.long() for drink in Drink.query.all()]
+        return jsonify({
+            'success': True,
+            "drinks": drinks
+        })
+    except Exception:
+        abort(422)
 
 '''
 @TODO implement endpoint
@@ -92,8 +97,7 @@ def create_drink(token):
                 "success": True,
                 "drinks": drink
             })
-        except BaseException as e:
-            print(e)
+        except BaseException:
             abort(422)
 
 '''
@@ -111,12 +115,22 @@ def create_drink(token):
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def update_drink(token, drink_id):
-    drink = Drink.query.filter_by(id=drink_id).one_or_none()
-
-    return jsonify({
-        "success": True,
-        "drinks": [drink]
-    })
+    try:
+        # force ignores the mimetype and always try to parse JSON
+        body = request.get_json(force=True)
+        title = body.get("title", None)
+        recipe = body.get("recipe", None)
+        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+        drink.title = title
+        drink.recipe = json.dumps(recipe)
+        drink.update()
+        return jsonify({
+            "success": True,
+            "drinks": [drink.long()]
+        })
+    except Exception as e:
+        print(e)
+        abort(422)
 
 
 '''
@@ -133,14 +147,19 @@ def update_drink(token, drink_id):
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def delete_drink(token, drink_id):
-    drink = Drink.query.filter_by(id=drink_id).one_or_none()
+    try:
+        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+        if drink is None:
+            abort(404)
+        drink.delete()
+        return jsonify({
+            "success": True,
+            "delete": drink_id
+        })
 
-    return jsonify({
-        "success": True,
-        "delete": drink
-    })
-
-
+    except Exception as e:
+        print(e)
+        abort(422)
 
 
 ## Error Handling
