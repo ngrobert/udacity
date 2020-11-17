@@ -66,8 +66,12 @@ The `--reload` flag will detect file changes and restart the server automaticall
     - `delete:drinks`
 6. Create new roles for:
     - Barista
+        - User: robert.ng@xandr.com
+        - password: udacity123*
         - can `get:drinks-detail`
     - Manager
+        - User: rng@appnexus.com
+        - password: udacity123*
         - can perform all actions
 7. Test your endpoints with [Postman](https://getpostman.com). 
     - Register 2 users - assign the Barista role to one and Manager role to the other.
