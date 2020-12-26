@@ -5,9 +5,8 @@ WORKDIR /app
 
 RUN pip install --upgrade pip
 RUN pip install flask
-#RUN pip install -r ../../requirements.txt
 
-RUN pip install --no-cache-dir -r ../../requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5000
 
