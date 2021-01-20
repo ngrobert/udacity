@@ -30,6 +30,7 @@ phases:
         - python -m pytest test_main.py
   build:
     commands:
+      - ls -altr
       - docker build --tag $REPOSITORY_URI:$TAG .
 
   post_build:
