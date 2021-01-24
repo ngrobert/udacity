@@ -31,6 +31,8 @@ phases:
   build:
     commands:
       - ls -altr
+      - echo $REPOSITORY_URI
+      - echo $TAG
       - docker build --tag $REPOSITORY_URI:$TAG .
 
   post_build:
