@@ -33,7 +33,9 @@ phases:
       - ls -altr
       - echo $REPOSITORY_URI
       - echo $TAG
-      - docker build --tag $REPOSITORY_URI:$TAG .
+      - ECR_REPO="simple_jwt_api"
+      - docker build --tag $ECR_REPO:$TAG .
+
 
   post_build:
     commands:
