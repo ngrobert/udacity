@@ -34,7 +34,7 @@ phases:
       - echo $REPOSITORY_URI
       - echo $TAG
       - ECR_REPO="simple_jwt_api"
-      - docker build --tag jwt-api-test:$TAG .
+      - docker build --tag $ECR_REPO:$TAG .
 
 
   post_build:
