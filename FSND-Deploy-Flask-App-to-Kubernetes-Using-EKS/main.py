@@ -79,11 +79,7 @@ def auth():
 
     user_data = body
 
-<<<<<<< HEAD
     return jsonify(token=_get_jwt(user_data).decode('utf-8'))
-=======
-    return jsonify(token=_get_jwt(user_data))
->>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
 
 
 @APP.route('/contents', methods=['GET'])
@@ -115,8 +111,4 @@ def _get_jwt(user_data):
     return jwt.encode(payload, JWT_SECRET, algorithm='HS256')
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     APP.run(host='127.0.0.1', port=8080, debug=True)
-=======
-    APP.run(host='127.0.0.1', port=8080, debug=True)
->>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e

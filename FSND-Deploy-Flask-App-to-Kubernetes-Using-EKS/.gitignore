@@ -17,10 +17,7 @@ _mailinglist
 docs/_build/
 __pycache__
 
-<<<<<<< HEAD
 
-=======
->>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
 # Coverage reports
 htmlcov/
 .coverage
