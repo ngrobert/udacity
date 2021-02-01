@@ -23,29 +23,48 @@ phases:
   pre_build:
       commands:
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+<<<<<<< HEAD
+=======
+        - ECR_REPO="simple_jwt_api"
+        - echo $ECR_REPO
+        - echo $REPOSITORY_URI
+        - echo $TAG
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
         - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' simple_jwt_api.yml
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
         - pip install -r requirements.txt
         - python -m pytest test_main.py
+<<<<<<< HEAD
+=======
+
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
   build:
     commands:
       - ls -altr
       - echo $REPOSITORY_URI
       - echo $TAG
+<<<<<<< HEAD
       - ECR_REPO="simple_jwt_api"
       - docker build --tag $ECR_REPO:$TAG .
 
+=======
+      - docker build --tag $REPOSITORY_URI:$TAG .
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
 
   post_build:
     commands:
       - docker push $REPOSITORY_URI:$TAG
+<<<<<<< HEAD
       - CREDENTIALS=$(aws sts assume-role --role-arn $EKS_KUBECTL_ROLE_ARN --role-session-name codebuild-kubectl --duration-seconds 900)
       - export AWS_ACCESS_KEY_ID="$(echo ${CREDENTIALS} | jq -r '.Credentials.AccessKeyId')"
       - export AWS_SECRET_ACCESS_KEY="$(echo ${CREDENTIALS} | jq -r '.Credentials.SecretAccessKey')"
       - export AWS_SESSION_TOKEN="$(echo ${CREDENTIALS} | jq -r '.Credentials.SessionToken')"
       - export AWS_EXPIRATION=$(echo ${CREDENTIALS} | jq -r '.Credentials.Expiration')
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
+=======
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
       - kubectl apply -f simple_jwt_api.yml
       - printf '[{"name":"simple_jwt_api","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
 artifacts:

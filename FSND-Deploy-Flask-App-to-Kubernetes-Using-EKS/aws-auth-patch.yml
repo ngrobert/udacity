@@ -4,13 +4,21 @@ data:
     - groups:
       - system:bootstrappers
       - system:nodes
+<<<<<<< HEAD
       rolearn: arn:aws:iam::342476802371:role/eksctl-simple-jwt-api-nodegroup-n-NodeInstanceRole-1P426IWFL7Q8D
+=======
+      rolearn: arn:aws:iam::342476802371:role/eksctl-simple-jwt-api-nodegroup-n-NodeInstanceRole-O9Q4U18PJDKR
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
       username: system:node:{{EC2PrivateDNSName}}
   mapUsers: |
     []
 kind: ConfigMap
 metadata:
+<<<<<<< HEAD
   creationTimestamp: "2021-01-27T05:59:33Z"
+=======
+  creationTimestamp: "2021-01-31T17:44:34Z"
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
   managedFields:
   - apiVersion: v1
     fieldsType: FieldsV1
@@ -21,9 +29,18 @@ metadata:
         f:mapUsers: {}
     manager: eksctl
     operation: Update
+<<<<<<< HEAD
     time: "2021-01-27T05:59:33Z"
   name: aws-auth
   namespace: kube-system
   resourceVersion: "1261"
   selfLink: /api/v1/namespaces/kube-system/configmaps/aws-auth
   uid: fa8ebd7b-1b05-4b52-b5bb-3652753b6c40
+=======
+    time: "2021-01-31T17:44:34Z"
+  name: aws-auth
+  namespace: kube-system
+  resourceVersion: "1297"
+  selfLink: /api/v1/namespaces/kube-system/configmaps/aws-auth
+  uid: 08479e62-2554-4e85-971e-a8b280547601
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e

@@ -17,7 +17,11 @@ Parameters:
   GitSourceRepo:
     Type: String
     Description: GitHub source repository - must contain a Dockerfile and buildspec.yml in the base
+<<<<<<< HEAD
     Default: udacity/FSND-Deploy-Flask-App-to-Kubernetes-Using-EKS
+=======
+    Default: FSND-Deploy-Flask-App-to-Kubernetes-Using-EKS
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
     MinLength: 1
     MaxLength: 100
     ConstraintDescription: You must enter a GitHub repository name
@@ -48,7 +52,11 @@ Parameters:
 
   CodeBuildDockerImage:
     Type: String
+<<<<<<< HEAD
     Default: aws/codebuild/standard:4.0
+=======
+    Default: aws/codebuild/docker:17.09.0
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
     Description: Default AWS CodeBuild Docker optimized image
     MinLength: 3
     MaxLength: 100
@@ -99,7 +107,11 @@ Metadata:
       KubectlRoleName:
         default: kubectl IAM role
       EksClusterName:
+<<<<<<< HEAD
         default: simple-jwt-api
+=======
+        default: EKS cluster name
+>>>>>>> df1f33f6ac8e21dffcfed2c263644c6998f3ab3e
 
 
 Resources:

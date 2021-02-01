@@ -1,0 +1,8 @@
+Collecting python-jose
+  Downloading python_jose-3.2.0-py2.py3-none-any.whl (26 kB)
+Requirement already satisfied: pyasn1 in /Users/rng/Library/Python/3.7/lib/python/site-packages (from python-jose) (0.4.8)
+Requirement already satisfied: ecdsa<0.15 in /usr/local/lib/python3.7/site-packages (from python-jose) (0.13.2)
+Requirement already satisfied: rsa in /Users/rng/Library/Python/3.7/lib/python/site-packages (from python-jose) (4.0)
+Requirement already satisfied: six<2.0 in /usr/local/lib/python3.7/site-packages (from python-jose) (1.15.0)
+Installing collected packages: python-jose
+Successfully installed python-jose-3.2.0
